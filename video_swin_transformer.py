@@ -557,6 +557,10 @@ class SwinTransformer3D(nn.Module):
         # add a norm layer for each output
         self.norm = norm_layer(self.num_features)
 
+        self.avg_pool = nn.AvgPool3d(kernel_size=[8, 7, 7], stride=[1, 1, 1])
+        self.dropout = nn.Dropout(0.5)
+        self.fc_cls = nn.Linear(1024, 400)
+
         self._freeze_stages()
 
     def _freeze_stages(self):
@@ -670,7 +674,10 @@ class SwinTransformer3D(nn.Module):
         x = self.norm(x)
         x = rearrange(x, 'n d h w c -> n c d h w')
 
-        return x
+        features = self.avg_pool(x).squeeze(-1).squeeze(-1).squeeze(-1)
+        logits = self.fc_cls(self.dropout(features))
+
+        return x, features, logits
 
     def train(self, mode=True):
         """Convert the model into training mode while keep layers freezed."""
