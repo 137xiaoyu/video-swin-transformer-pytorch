@@ -559,7 +559,8 @@ class SwinTransformer3D(nn.Module):
 
         self.avg_pool = nn.AvgPool3d(kernel_size=[8, 7, 7], stride=[1, 1, 1])
         self.dropout = nn.Dropout(0.5)
-        self.fc_cls = nn.Linear(1024, 400)
+        # self.fc_cls = nn.Linear(1024, 400)
+        self.fc_cls = nn.Linear(768, 400)
 
         self._freeze_stages()
 
